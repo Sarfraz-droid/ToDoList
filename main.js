@@ -27,6 +27,8 @@ submitbtn.addEventListener("click", function() {
     });
     edit.addEventListener("click", function() {
         edit.hidden = true;
+        checktask.hidden = true;
+        inputtext.hidden = true;
         inputtext.innerHTML = "";
         var changebtn = document.createElement("button");
         var change_text = document.createElement("input");
@@ -39,6 +41,8 @@ submitbtn.addEventListener("click", function() {
         changebtn.addEventListener("click", function() {
             inputtext.innerHTML = change_text.value;
             edit.hidden = false;
+            checktask.hidden = false;
+            inputtext.hidden = false;
             changebtn.remove();
             change_text.remove();
             console.log("added new input");
