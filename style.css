@@ -1,0 +1,77 @@
+#container {
+    padding: 5% 5%;
+    text-align: center;
+}
+
+button {
+    box-sizing: border-box;
+    border: none;
+    padding: 25px;
+    margin: 1%;
+    color: white;
+    background-color: black;
+    border: 2px solid transparent;
+}
+
+#todosubmit {
+    border-radius: 20px;
+    margin: 0 1% 0 1%;
+}
+
+input {
+    border-width: 0 0;
+    border-bottom: 1px solid;
+    padding: 20px;
+    height: 50px;
+    border-radius: 0%;
+    background-color: transparent;
+    outline: none;
+    margin: 1%;
+}
+
+button:hover {
+    box-sizing: border-box;
+    color: black;
+    background-color: white;
+    border-color: black;
+    border: 2px solid black;
+}
+
+.todostext {
+    height: 80px;
+}
+
+label {
+    text-align: left;
+    width: 470px;
+    padding: 5% 2%;
+    font-size: 2.5rem;
+}
+
+input[type=checkbox] {
+    width: 50px;
+    height: 100px;
+}
+
+input[type="checkbox"]:checked+label {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+h2 {
+    display: flex;
+}
+
+h2 button {
+    border-radius: 25px;
+}
+
+#todocontainer {
+    padding: 0% 23%;
+}
+
+h2 {
+    background-color: #f2f2f2;
+    padding: 2% 5%;
+    border-radius: 50px;
+}
