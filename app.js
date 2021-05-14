@@ -84,7 +84,7 @@ app.post("/delete", function(req, res) {
     const listname = _.camelCase(req.body.listname);
     console.log(listname + " delete");
 
-    if (listname === "Today") {
+    if (listname === "today") {
         Item.findByIdAndRemove(checkboxId, function(err) {
             if (err) {
                 res.redirect("/");
