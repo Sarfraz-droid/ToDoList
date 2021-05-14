@@ -1,0 +1,12 @@
+<%- include("header") -%>
+    <div class="login homepage-ui">
+        <h1 class="text-dark">
+            <%=Heading%>
+        </h1>
+        <form action="/<%=headpost%>" method="post">
+            <input class="text-center lg form-control shadow" type="text" name="username" id="username" placeholder="Username">
+            <input class="text-center lg form-control shadow" type="password" name="password" id="" placeholder="Password">
+            <button class=" shadow ui-btn mt-3 lg-submit" type="submit"><%=Heading%></button>
+        </form>
+    </div>
+    <%- include("footer") -%>

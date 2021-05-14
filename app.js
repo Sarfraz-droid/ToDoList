@@ -5,6 +5,7 @@ const { Template } = require("ejs");
 const mongoose = require("mongoose");
 var _ = require('lodash');
 
+
 const app = express();
 
 mongoose.connect('mongodb+srv://admin-sarfraz:2june2002@cluster0.f1xwx.mongodb.net/todolistDB', { useNewUrlParser: true, useUnifiedTopology: true });
@@ -13,21 +14,7 @@ const todo = {
     name: String
 };
 
-const Item = mongoose.model("TodoList", todo);
-
-const item1 = new Item({
-    name: "Welcome to your ToDoList"
-});
-
-const item2 = new Item({
-    name: "Testing 2"
-});
-
-const item3 = new Item({
-    name: "Testing 3"
-});
-
-const defaultItems = [item1, item2, item3];
+const Item = mongoose.model("item", todo);
 
 
 const listSchema = {
@@ -35,99 +22,153 @@ const listSchema = {
     items: [todo]
 };
 
-const List = mongoose.model("List", listSchema);
+const Listschema = mongoose.model("Listscheme", listSchema);
+
+const rootdatabase = {
+    name: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    items: [todo]
+};
+const List = mongoose.model("Todolist", rootdatabase);
 
 app.set('view engine', 'ejs');
-
+const item1 = new Item({
+    name: "Hello"
+})
+const today = new Listschema({
+    name: "Today",
+    items: []
+});
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/public', express.static("public"));
 
 app.get("/", function(req, res) {
+    res.render('homepage');
+});
 
-
-    Item.find({}, function(err, item) {
-
-        res.render("list", {
-            ListTitle: "Today",
-            newListitem: item
-        });
-
+app.get("/login", function(req, res) {
+    res.render('lgandsb', {
+        Heading: "Login",
+        headpost: "login"
     });
+});
 
+app.get("/signup", function(req, res) {
+    res.render('lgandsb', {
+        Heading: "Sign Up",
+        headpost: "signup"
+    });
 });
 
 
+app.post("/:id", function(req, res) {
 
-app.post("/", function(req, res) {
+    if (req.params.id == "signup") {
+        const newEntry = new List({
+            name: req.body.username,
+            password: req.body.password,
+            items: []
+        });
+        newEntry.save(function(err) {
+            if (err) {
+                res.render('info', {
+                    err: err,
+                    url: req.params.id
+                });
+            } else {
+                res.redirect('/login');
+            }
+
+        });
+    } else {
+        List.findOne({ name: req.body.username, password: req.body.password }, function(err, user) {
+            console.log(user);
+            if (user == null) {
+                res.render('info', {
+                    err: "Incorrect Username and Password",
+                    url: "Home"
+                })
+            } else if (!err) {
+                res.redirect(req.body.username + '/today');
+            } else {
+                res.render('info', {
+                    err: err,
+                    url: "Home"
+                });
+            }
+        });
+    }
+})
+
+app.post("/:user/:id/add", function(req, res) {
 
     const item = req.body.newItem;
     const listname = _.camelCase(req.body.list);
+    const user = req.params.user;
     const newItem = new Item({
         name: item
     });
     console.log(listname + " Add")
-    if (listname === "today") {
-        newItem.save();
-        res.redirect("/");
-    } else {
-        List.findOne({ name: listname }, function(err, foundList) {
+
+    console.log(newItem);
+    List.findOne({ name: req.params.user }, 'items', function(err, foundList) {
+        console.log(foundList);
+        if (!err) {
             foundList.items.push(newItem);
             foundList.save();
-            res.redirect("/" + listname);
-        });
-    }
+            res.redirect("/" + user + "/" + listname);
+        } else {
+            res.redirect('info', {
+                err: err,
+                url: "Home"
+            });
+        }
+
+    });
 });
 
-app.post("/delete", function(req, res) {
+app.post("/:user/:id/delete", function(req, res) {
     const checkboxId = req.body.checkbox;
     const listname = _.camelCase(req.body.listname);
+    const username = req.params.user;
     console.log(listname + " delete");
 
-    if (listname === "today") {
-        Item.findByIdAndRemove(checkboxId, function(err) {
-            if (err) {
-                res.redirect("/");
-            } else {
-                res.redirect("/");
-            }
-        });
-    } else {
-        List.findOneAndUpdate({ name: listname }, { $pull: { items: { _id: checkboxId } } }, function(err, result) {
-            if (!err) {
-                res.redirect("/" + listname);
-            }
-        });
-
-    }
-
+    List.findOneAndUpdate({ name: username }, { $pull: { items: { _id: checkboxId } } }, function(err, result) {
+        if (!err) {
+            res.redirect("/" + username + "/" + req.params.id);
+        } else {
+            console.log(err);
+        }
+    });
 });
 
-app.get("/:customList", function(req, res) {
+app.get("/:user/:customList", function(req, res) {
     const customListname = _.camelCase(req.params.customList);
 
-    List.findOne({ name: customListname }, function(err, foundList) {
-
+    List.findOne({ name: req.params.user }, 'items', function(err, foundList) {
         if (!err) {
-            if (!foundList) {
-                const list = new List({
-                    name: customListname,
-                    items: []
-                });
-                list.save();
-                console.log("Does not Exit");
-                res.redirect("/" + customListname);
-            } else {
-                console.log(foundList.items);
-                res.render("list", {
-                    ListTitle: _.capitalize(customListname),
-                    newListitem: foundList.items
-                });
-                console.log("Exists");
-            }
+            res.render("list", {
+                ListTitle: _.capitalize(customListname),
+                newListitem: foundList,
+                username: req.params.user,
+                titlepost: customListname
+            });
+        } else {
+            res.render("info", {
+                err: err,
+                url: "Home"
+            });
         }
-    })
 
+    });
 });
 
 
