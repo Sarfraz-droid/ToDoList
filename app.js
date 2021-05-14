@@ -7,7 +7,7 @@ var _ = require('lodash');
 
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/todolistDB', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb+srv://admin-sarfraz:2june2002@cluster0.f1xwx.mongodb.net/todolistDB', { useNewUrlParser: true, useUnifiedTopology: true });
 
 const todo = {
     name: String
@@ -67,15 +67,15 @@ app.post("/", function(req, res) {
         name: item
     });
     console.log(listname + " Add")
-    if (listname === "Today") {
+    if (listname === "today") {
         newItem.save();
         res.redirect("/");
     } else {
         List.findOne({ name: listname }, function(err, foundList) {
             foundList.items.push(newItem);
             foundList.save();
+            res.redirect("/" + listname);
         });
-        res.redirect("/" + listname);
     }
 });
 
@@ -97,7 +97,8 @@ app.post("/delete", function(req, res) {
             if (!err) {
                 res.redirect("/" + listname);
             }
-        })
+        });
+
     }
 
 });
@@ -106,7 +107,6 @@ app.get("/:customList", function(req, res) {
     const customListname = _.camelCase(req.params.customList);
 
     List.findOne({ name: customListname }, function(err, foundList) {
-        console.log(foundList);
 
         if (!err) {
             if (!foundList) {
@@ -118,6 +118,7 @@ app.get("/:customList", function(req, res) {
                 console.log("Does not Exit");
                 res.redirect("/" + customListname);
             } else {
+                console.log(foundList.items);
                 res.render("list", {
                     ListTitle: _.capitalize(customListname),
                     newListitem: foundList.items
