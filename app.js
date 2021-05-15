@@ -4,11 +4,13 @@ const bodyParser = require("body-parser");
 const { Template } = require("ejs");
 const mongoose = require("mongoose");
 var _ = require('lodash');
+require('dotenv').config();
+
 
 
 const app = express();
 
-mongoose.connect('mongodb+srv://admin-sarfraz:2june2002@cluster0.f1xwx.mongodb.net/todolistDB', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.URL, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const todo = {
     name: String
